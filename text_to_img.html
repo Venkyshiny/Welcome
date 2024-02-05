@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        /* Style the button */
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+
+        .loader {
+            border: 16px solid #f3f3f3;
+            /* Light grey */
+            border-top: 16px solid #3498db;
+            /* Blue */
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        section{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .loadfull{
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="text" placeholder="Enter your text" id="AII">
+    <button onclick="generateImage()">Click me</button>
+    <br><br>
+    <hr>
+    <br>
+    <br>
+    <section class="loadfull">
+        <div class="loader"></div>
+        <h2>Thambi Image innum Varala</h2>
+    </section>
+    <div class="image-grid">
+        <img src="#" alt="Image 1" width="512" height="512">
+        <img src="#" alt="Image 2" width="512" height="512">
+        <img src="#" alt="Image 3" width="512" height="512">
+        <img src="#" alt="Image 4" width="512" height="512">
+    </div>
+    <script>
+        const API_KEY = "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";
+        document.querySelector('.image-grid').style.display = 'none'
+        const generateImage = async () => {
+            let value = document.querySelector('#AII').value
+            if (value === '' || !value)
+                return;
+            const options = {
+                method: "POST",
+                headers: {
+                    'Authorization': `Bearer ${API_KEY}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    "prompt": value,
+                    "n": 4,
+                    "size": "512x512"
+                })
+            }
+            try {
+                document.querySelector('.loadfull').style='display:flex';
+                const res = await fetch('https://api.openai.com/v1/images/generations', options)
+                const data = await res.json()
+                document.querySelector('.loadfull').style = 'display:none';
+                let img = document.querySelectorAll('img');
+                let i = 0;
+                for (const obj of data.data) {
+                    img[i].src = obj.url
+                    i++
+                }
+                document.querySelector('.image-grid').style.display = 'grid'
+                
+            } catch (error) {
+                alert(error.message)
+                //location.reload()
+                console.log(error);
+            }
+        }
+    </script>
+</body>
+
+</html>
